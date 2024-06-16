@@ -1,19 +1,73 @@
 import pandas as pd
 import streamlit as st
+import os
 
-donors = pd.DataFrame({
-    'id': [1, 2, 3],
-    'name': ['Donor A', 'Donor B', 'Donor C'],
-    'blood_group': ['A', 'B', 'O'],
-    'rh_factor': ['+', '-', '+']
-})
+os.makedirs('data', exist_ok=True)
+csv_file = 'donors.csv'
+if not os.path.isfile(csv_file):
+    donors_df = pd.DataFrame(columns=[
+        'id', 'name', 'blood_group', 'rh_factor', 
+         'phone_number', 'unit','Deployment','last_donation_date'
+    ])
+    donors_df.to_csv(csv_file, index=False)
+else:
+    donors_df = pd.read_csv(csv_file)
 
-recipients = pd.DataFrame({
-    'id': [101, 102, 103],
-    'name': ['Recipient X', 'Recipient Y', 'Recipient Z'],
-    'blood_group': ['A', 'AB', 'O'],
-    'rh_factor': ['+', '+', '-']
-})
+# Title
+
+st.markdown(
+    """
+    <style>
+    .main {
+        background-image: url("blood.jpg");
+        background-size: cover;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+st.title('Blood Group Matching and Donor Management')
+
+# Form to add a new donor
+st.header('Add a New Donor')
+with st.form('add_donor_form'):
+    id = st.text_input('Unique ID')
+    name = st.text_input('Name')
+    blood_group = st.selectbox('Blood Group', ['A', 'B', 'AB', 'O'])
+    rh_factor = st.selectbox('Rh Factor', ['+', '-'])
+    location = st.text_input('Location')
+    phone_number = st.text_input('Phone Number')
+    unit = st.number_input('Unit', min_value=0, step=1)
+    last_donation_date = st.date_input('Last Donation Date')
+
+    submit_button = st.form_submit_button('Add Donor')
+
+if submit_button:
+    # Create a new donor entry
+    new_donor = {
+        'id': id,
+        'name': name,
+        'blood_group': blood_group,
+        'rh_factor': rh_factor,
+        'location': location,
+        'phone_number': phone_number,
+        'unit': unit,
+        'last_donation_date': last_donation_date
+    }
+    
+    # Append new donor to the DataFrame
+    donors_df = donors_df.append(new_donor, ignore_index=True)
+    
+    # Save updated DataFrame to CSV
+    donors_df.to_csv(csv_file, index=False)
+    
+    st.success('Donor added successfully!')
+
+# Display the donors list
+st.header('Current Donors')
+st.dataframe(donors_df)
+
+
 
 # Blood group compatibility rules
 compatible_blood_groups = {
@@ -37,19 +91,6 @@ def find_compatible_donors(recipient):
     return compatible_donors
 
 
-# Streamlit app
-st.markdown(
-    """
-    <style>
-    .main {
-        background-image: url("blood.jpg");
-        background-size: cover;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-st.title('Blood Group Matching')
 
 # User input for recipient's blood group and Rh factor
 blood_group = st.selectbox('Select your blood group', ['A', 'B', 'AB', 'O'])
