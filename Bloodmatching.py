@@ -80,7 +80,7 @@ compatible_blood_groups = {
     'AB': ['AB'],
     'O': ['A', 'B', 'AB', 'O']
 }
-def compatible_blood_groups (donor, recipient):
+def is_compatible (donor, recipient):
     if recipient['blood_group'] in compatible_blood_groups[donor['blood_group']]:
         # Check Rh factor compatibility
         if recipient['rh_factor'] == '+' or (recipient['rh_factor'] == '-' and donor['rh_factor'] == '-'):
@@ -89,8 +89,8 @@ def compatible_blood_groups (donor, recipient):
 
 def find_compatible_donors(recipient):
     compatible_donors = []
-    for _, donor in donors.iterrows():
-        if compatible_blood_groups(donor, recipient):
+    for _, donor in donors_df.iterrows():
+        if is_compatible(donor, recipient):
             compatible_donors.append(donor)
     return compatible_donors
 
