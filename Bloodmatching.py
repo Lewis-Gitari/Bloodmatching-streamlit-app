@@ -91,7 +91,16 @@ def find_compatible_donors(recipient):
     compatible_donors = []
     for _, donor in donors_df.iterrows():
         if is_compatible(donor, recipient):
-            compatible_donors.append(donor)
+            compatible_donors.append({
+                'id': donor ['id'],
+                'name' : donor['name'],
+                'blood_group' : donor['blood_group'],
+                'rh_factor' : donor['rh_factor'],
+                'phone_number' : donor['phone_number'],
+                'location' : donor['location'],
+                'unit' : donor['unit'],
+                'last_donation_date' : donor['last_donation_date']
+                })
     return compatible_donors
 
 
